@@ -1,2 +1,4 @@
-**/checkpoints
-test_results
+checkpoints/
+__pycache__/
+stats/
+test_results/
