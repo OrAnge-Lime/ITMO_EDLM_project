@@ -3,7 +3,7 @@
 Кратко
 ------
 Проект по квантизации модели CartoonGAN для ускорения модели на инференсе (CPU). Реализованы следующие методы ускорения:
-	- PTQ (Post Training Quantization)
+- PTQ (Post Training Quantization)
 
 Репозиторий содержит Docker с инструкцией по запуску
 
