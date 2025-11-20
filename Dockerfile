@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 COPY . /app
+RUN test -d /app/weights || echo "Directory /app/weights does not exist. Check README"
 
 RUN python3.11 -m venv /app/env
 
