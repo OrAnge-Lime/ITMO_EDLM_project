@@ -5,7 +5,7 @@ import torch.quantization as tq
 import torch
 from torchvision import datasets
 import torchvision.transforms as transforms
-
+import argparse
 from tqdm import tqdm
 
 CALIB_SIZE = 32
@@ -24,7 +24,7 @@ def get_no_aug_transform(size:int = IMAGE_SIZE) -> Generator:
 
 def run_post_train_quantization(
         weights_path: str,
-        save_path: str = None,
+        save_path: str,
         img_size: int = IMAGE_SIZE,
         calib_size: int = CALIB_SIZE,
 ):
@@ -76,3 +76,20 @@ def run_post_train_quantization(
         torch.save(netG.state_dict(), save_path, weights_only=False)
 
     return netG
+
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--weights_path", type=str, required=True)
+    parser.add_argument("--save_path", type=str, required=True)
+    parser.add_argument("--img_size", type=int, required=False)
+    parser.add_argument("--calib_size", type=int, required=False)
+    args = parser.parse_args()
+
+    run_post_train_quantization(
+        args.weights_path,
+        args.save_path,
+        args.img_size,
+        args.calib_size
+    )
