@@ -42,5 +42,10 @@ python script.py
 Post-Training Quantization (PTQ)
 -------------------------------
 Ниже — общая последовательность шагов для запуска PTQ
+По итогу выполнения квантизации веса модели сохраняются по указанному пути (save_path)
 
-...
+```
+cd src
+python quantization/PTQ/post_training_quantization.py --weights_path путь_до_весов --save_path путь_куда_сохранить_веса
+--img_size размер_изображения(опционально) --calib_size количество_фейк_изображений(опционально)
+```
