@@ -22,14 +22,16 @@ def get_no_aug_transform(size:int = IMAGE_SIZE) -> Generator:
 
 
 
-def ptq_quantization(
+def run_post_train_quantization(
         weights_path: str,
+        save_path: str = None,
         img_size: int = IMAGE_SIZE,
-        calib_size: int = CALIB_SIZE
+        calib_size: int = CALIB_SIZE,
 ):
     """
         Parameters:
         weights_path: Путь до весов модели CartoonGAN (trained_netG.pth)
+        save_path: Путь куда сохранить веса модели (например /weights/generator_int8.pth)
         img_size: Размер изображения (по умолчанию 512)
         calib_size: Количество фейковых изображений для калибровки параметров квантизации
 
@@ -69,5 +71,8 @@ def ptq_quantization(
     except Exception as e:
         print(e)
 
+
+    if save_path:
+        torch.save(netG.state_dict(), save_path, weights_only=False)
 
     return netG
