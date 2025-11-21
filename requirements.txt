@@ -1,3 +1,8 @@
 torch==2.6.0
 tqdm
 matplotlib
+typer==0.12.5
+ffmpeg
+tqdm
+pillow
+opencv-python
