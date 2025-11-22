@@ -35,25 +35,73 @@ def predict_file(model, input_path, output_path, batch_size):
         image = Image.open(input_path).convert('RGB')
         predicted_image = predict_images([image], model)[0]
         predicted_image.save(output_path)
+    
     # File is video
     elif mimetypes.guess_type(input_path)[0].startswith("video"):
-        # Create temp folder for storing frames as images
-        temp_dir = tempfile.TemporaryDirectory()
-        # Extract frames from video
-        subprocess.run(f"ffmpeg -i \"{input_path}\" -loglevel error -stats \"{os.path.join(temp_dir.name, 'frame_%07d.png')}\"")
-        # Process images with model
-        frame_paths = listdir_fullpath(temp_dir.name)
-        batches = [*divide_chunks(frame_paths, batch_size)]
-        for path_chunk in tqdm(batches):
-            imgs = [Image.open(p) for p in path_chunk]
-            imgs = predict_images(imgs)
-            for path, img in zip(path_chunk, imgs):
-                img.save(path)
-        # Get video frame rate
-        frame_rate = subprocess.check_output(f"ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"{input_path}\"")
-        frame_rate = eval(frame_rate.split()[0]) # Dirty eval
-        # Combine frames with original audio
-        subprocess.run(f"ffmpeg -y -r {frame_rate} -i \"{os.path.join(temp_dir.name, 'frame_%07d.png')}\" -i \"{input_path}\" -map 0:v -map 1:a? -loglevel error -stats \"{output_path}\"")
+    # Создаём временную директорию (она удалится автоматически при выходе из with)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Путь-шаблон для ffmpeg (кадры положатся в tmpdir)
+            out_template = os.path.join(tmpdir, "frame_%07d.png")
+    
+            # Команда ffmpeg — передаём аргументы как список (без shell),
+            # чтобы %07d корректно обрабатывался ffmpeg'ом
+            ffmpeg_cmd = [
+                "ffmpeg",
+                "-i", input_path,
+                "-vsync", "0",            # надёжное сохранение всех кадров
+                "-start_number", "1",     # нумерация с 1 (можно поставить 0)
+                "-loglevel", "error",     # можно убрать, если хочешь видеть предупреждения
+                out_template
+            ]
+    
+            try:
+                subprocess.run(ffmpeg_cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            except subprocess.CalledProcessError as e:
+                # Выведем stderr ffmpeg для диагностики
+                stderr = e.stderr.decode("utf-8", errors="replace") if e.stderr else ""
+                raise RuntimeError(f"ffmpeg failed: {stderr}") from e
+    
+            # Получаем список сохранённых кадров и сортируем по номеру в имени
+            frame_paths = glob.glob(os.path.join(tmpdir, "frame_*.png"))
+    
+            # Если не найдено кадров — выбросим понятную ошибку
+            if not frame_paths:
+                raise FileNotFoundError(f"No frames were extracted to {tmpdir}. Check ffmpeg output and input_path.")
+    
+            # Сортировка по числовому индексу в имени файла
+            def _frame_key(path):
+                m = re.search(r"(\d+)\.png$", path)
+                return int(m.group(1)) if m else -1
+    
+            frame_paths.sort(key=_frame_key)
+    
+            # Разбиваем на батчи и обрабатываем
+            batches = [*divide_chunks(frame_paths, batch_size)]
+            for path_chunk in tqdm(batches):
+                imgs = [Image.open(p) for p in path_chunk]
+                imgs = predict_images(imgs, model)  # предполагаем, что возвращает список PIL.Image
+                for path, img in zip(path_chunk, imgs):
+                    img.save(path)
+
+            fps = 30.0
+
+            output_video = output_path
+    
+            ffmpeg_encode = [
+                "ffmpeg",
+                "-framerate", str(fps),
+                "-i", os.path.join(tmpdir, "frame_%07d.png"),
+                "-c:v", "libx264",
+                "-preset", "medium",
+                "-crf", "18",
+                "-pix_fmt", "yuv420p",
+                "-loglevel", "error",
+                output_video
+            ]
+
+            subprocess.run(ffmpeg_encode, check=True)
+    
+            print("Готово! Видео сохранено в:", output_video)
     else:
         raise IOError("Invalid file extension.")
 
