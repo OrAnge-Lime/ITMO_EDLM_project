@@ -1,4 +1,6 @@
 checkpoints/
 __pycache__/
+data/
 stats/
 test_results/
+res/
