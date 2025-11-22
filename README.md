@@ -1,5 +1,7 @@
 # ITMO_EDLM_project
 
+Оригинал: https://github.com/FilipAndersson245/cartoon-gan
+
 Кратко
 ------
 Проект по квантизации модели CartoonGAN для ускорения модели на инференсе (CPU). Реализованы следующие методы ускорения:
