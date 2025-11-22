@@ -46,19 +46,20 @@ Post-Training Quantization (PTQ)
 <div style="display: flex; gap: 20px;">
 
   <figure style="text-align: bottom;">
-    <img src="gifs/output_o.gif" width="300">
+    <img src="gifs/output_o.gif" width="256">
     <figcaption><b>Original version</b></figcaption>
   </figure>
 
   <figure style="text-align: bottom;">
-    <img src="gifs/output_q.gif" width="300">
+    <img src="gifs/output_q.gif" width="256">
     <figcaption> <b>Quantized version </b></figcaption>
   </figure>
 
 </div>
 
-
-Ниже — общая последовательность шагов для запуска PTQ
+***
+В директории PTQ есть ноутбук с примером квантизации
+Ниже — общая последовательность шагов для запуска PTQ из функции run_post_training_quantization
 По итогу выполнения квантизации веса модели сохраняются по указанному пути (save_path)
 
 ```
