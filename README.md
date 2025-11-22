@@ -41,6 +41,23 @@ python script.py
 
 Post-Training Quantization (PTQ)
 -------------------------------
+Сравнение оригинала с квантованной версией:
+
+<div style="display: flex; gap: 20px;">
+
+  <figure style="text-align: bottom;">
+    <img src="gifs/output_o.gif" width="300">
+    <figcaption><b>Original version</b></figcaption>
+  </figure>
+
+  <figure style="text-align: bottom;">
+    <img src="gifs/output_q.gif" width="300">
+    <figcaption> <b>Quantized version </b></figcaption>
+  </figure>
+
+</div>
+
+
 Ниже — общая последовательность шагов для запуска PTQ
 По итогу выполнения квантизации веса модели сохраняются по указанному пути (save_path)
 
