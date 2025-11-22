@@ -69,3 +69,21 @@ cd src
 python quantization/PTQ/post_training_quantization.py --weights_path путь_до_весов --save_path путь_куда_сохранить_веса
 --img_size размер_изображения(опционально) --calib_size количество_фейк_изображений(опционально)
 ```
+
+
+Structured pruning
+-------------------------------
+Для реализации прунинга была использована утилита torch_pruning с дальнейшим дообучением модели на [Real to Ghibli Image dataset](https://www.kaggle.com/datasets/shubham1921/real-to-ghibli-image-dataset-5k-paired-images). Ниже представлены примеры генерации оригинальной и вариантов сжатой моделей:
+
+Оригинальная модель CartoonGAN (11M params):
+<img width="676" height="359" alt="image_2025-11-22_13-50-35" src="https://github.com/user-attachments/assets/55f13ee7-aef5-4436-8138-0f5533bfa0fd" />
+
+Reduction: 11.7% 9,8M params:
+
+<img width="676" height="359" alt="image_2025-11-22_13-49-19" src="https://github.com/user-attachments/assets/34d5ff9e-cc4e-4e72-9abe-30ea3005b654" />
+
+Reduction: 22.6% 8,6M params:
+
+<img width="676" height="359" alt="image_2025-11-22_13-49-47" src="https://github.com/user-attachments/assets/b5f61852-f8bb-4cec-ab4e-0cd5559ab846" />
+
+Полный пайплайн прунинга с дальнейшим дообучением представлен в ветке `prune` в ноутбуке `prune.ipynb`
